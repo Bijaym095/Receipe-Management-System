@@ -1,3 +1,5 @@
+import MainNav from "@/components/layouts/main-nav";
+
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
@@ -25,9 +27,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <div className="pt-16">
+          <MainNav />
+          <main>{children}</main>
+        </div>
       </body>
     </html>
   );
