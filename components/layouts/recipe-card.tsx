@@ -6,21 +6,12 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import Image from "next/image";
+import { IRecipe } from "@/types/recipe";
 import Link from "next/link";
 
-interface ReceipeCardProps extends React.ComponentProps<"div"> {
-  id: string;
-  title: string;
-  summary: string;
-  label: string;
-  author: string;
-  published: string;
-  url: string;
-  image: string;
-}
+interface RecipeCardProps extends IRecipe {}
 
-function ReceipeCard({ id, url, image, title, summary }: ReceipeCardProps) {
+function ReceipeCard({ id, name, description }: RecipeCardProps) {
   return (
     <Card
       key={id}
@@ -28,29 +19,29 @@ function ReceipeCard({ id, url, image, title, summary }: ReceipeCardProps) {
     >
       <div className="aspect-16/9 w-full">
         <Link
-          href={url}
+          href={`/${id}`}
           className="fade-in transition-opacity duration-200 hover:opacity-70"
         >
-          <Image
+          {/* <Image
             src={image}
             alt={title}
             width={400}
             height={400}
             className="h-full w-full object-cover object-center"
-          />
+          /> */}
         </Link>
       </div>
       <CardHeader className="gap-0">
         <h3 className="text-lg font-semibold hover:underline md:text-xl">
-          <Link href={url}>{title}</Link>
+          <Link href={`/${id}`}>{name}</Link>
         </h3>
       </CardHeader>
-      <CardContent>
-        <p className="text-muted-foreground">{summary}</p>
+      <CardContent className="[&_p]:line-clamp-3">
+        <p className="text-muted-foreground">{description}</p>
       </CardContent>
       <CardFooter>
         <Link
-          href={url}
+          href={`/${id}`}
           className="text-foreground flex items-center hover:underline"
         >
           Read more
