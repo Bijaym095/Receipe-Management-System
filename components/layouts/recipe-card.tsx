@@ -6,7 +6,7 @@ import {
   CardFooter,
   CardHeader,
 } from "@/components/ui/card";
-import { IRecipe } from "@/types/recipe";
+import { IRecipe } from "@/types/recipe.type";
 import Link from "next/link";
 
 interface RecipeCardProps extends IRecipe {}
@@ -17,7 +17,7 @@ function ReceipeCard({ id, name, description }: RecipeCardProps) {
       key={id}
       className="grid grid-rows-[auto_auto_1fr_auto] overflow-hidden pt-0"
     >
-      <div className="aspect-16/9 w-full">
+      <div className="aspect-video w-full">
         <Link
           href={`/${id}`}
           className="fade-in transition-opacity duration-200 hover:opacity-70"
