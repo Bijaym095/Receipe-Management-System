@@ -1,5 +1,10 @@
 import RecipeListing from "@/components/layouts/recipe-listing";
+import { Metadata } from "next";
 import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: "Home - Recipe Management System",
+}
 
 export default function Home() {
   return (
