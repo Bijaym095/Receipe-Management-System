@@ -7,6 +7,7 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { IRecipe } from "@/types/recipe.type";
+import Image from "next/image";
 import Link from "next/link";
 
 interface RecipeCardProps extends IRecipe {}
@@ -22,13 +23,13 @@ function ReceipeCard({ id, name, description }: RecipeCardProps) {
           href={`/${id}`}
           className="fade-in transition-opacity duration-200 hover:opacity-70"
         >
-          {/* <Image
-            src={image}
-            alt={title}
+          <Image
+            src="/card-placeholder-img.jpg"
+            alt={name}
             width={400}
             height={400}
             className="h-full w-full object-cover object-center"
-          /> */}
+          />
         </Link>
       </div>
       <CardHeader className="gap-0">
