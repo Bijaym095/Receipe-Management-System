@@ -19,7 +19,7 @@ export async function GET(
       return Response.json({ message: "Recipe not found" }, { status: 404 });
     } 
 
-    return Response.json({ message: "Recipe fetched successfully" });
+    return Response.json({ message: "Recipe fetched successfully", data });
   } catch (error) {
     if (error instanceof Error) {
       console.error("Error fetching recipe details:", error.message);

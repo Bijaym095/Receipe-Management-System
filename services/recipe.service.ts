@@ -17,9 +17,7 @@ export async function getAllRecipes() {
 }
 
 // CREATE new recipe
-export async function createRecipe(
-  recipe: Omit<IRecipe, "id" | "createdAt" | "updatedAt">
-) {
+export async function createRecipe(recipe: Omit<IRecipe, "id">) {
   const res = await fetch(`${API_URL}/recipes`, {
     method: "POST",
     headers: {
@@ -30,5 +28,12 @@ export async function createRecipe(
 
   if (!res.ok) throw new Error("Failed to create recipe");
 
+  return res.json();
+}
+
+// GET single recipe detail
+export async function getSingleRecipe(id: string) {
+  const res = await fetch(`${API_URL}/recipes/${id}`);
+  if (!res.ok) throw new Error("Failed to fetch recipe by id");
   return res.json();
 }
