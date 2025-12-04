@@ -1,4 +1,4 @@
-import { ArrowRight } from "lucide-react";
+"use client";
 
 import {
   Card,
@@ -7,12 +7,14 @@ import {
   CardHeader,
 } from "@/components/ui/card";
 import { IRecipe } from "@/types/recipe.type";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import RecipeCardAction from "./recipe-card-action";
 
 interface RecipeCardProps extends IRecipe {}
 
-function ReceipeCard({ id, name, description }: RecipeCardProps) {
+function RecipeCard({ id, name, subname, description }: RecipeCardProps) {
   return (
     <Card
       key={id}
@@ -40,7 +42,7 @@ function ReceipeCard({ id, name, description }: RecipeCardProps) {
       <CardContent className="[&_p]:line-clamp-3">
         <p className="text-muted-foreground">{description}</p>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="flex flex-wrap justify-between items-center gap-4">
         <Link
           href={`/${id}`}
           className="text-foreground flex items-center hover:underline"
@@ -48,9 +50,11 @@ function ReceipeCard({ id, name, description }: RecipeCardProps) {
           Read more
           <ArrowRight className="ml-2 size-4" />
         </Link>
+
+        <RecipeCardAction recipe={{ id, name, subname, description }} />
       </CardFooter>
     </Card>
   );
 }
 
-export default ReceipeCard;
+export default RecipeCard;
