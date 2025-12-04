@@ -1,7 +1,12 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+import { recipeTable } from "./schema";
 
 const connectionString = process.env.DATABASE_URL!;
 
 export const connection = postgres(connectionString, { prepare: false });
-export const db = drizzle(connection);
+export const db = drizzle(connection, {
+    schema: {
+        recipeTable
+    }
+});
