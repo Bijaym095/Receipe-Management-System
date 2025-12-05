@@ -18,8 +18,10 @@ export const GET = catchAsync(async () => {
 export const POST = catchAsync(async (request: Request) => {
   const body = await request.json();
 
+  // Validate the request body
   const parsedBody = recipeSchema.parse(body);
-
+  
+  // Check if a recipe with the same name already exists
   const recipeExists = await db.query.recipeTable.findFirst({
     where: eq(recipeTable.name, body.name),
   });
