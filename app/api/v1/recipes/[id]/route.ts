@@ -1,79 +1,152 @@
 import { db } from "@/db";
-import { recipes } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { recipeTable } from "@/db/schema";
+import { recipeSchema } from "@/definitions/recipe";
+import { ErrorResponse, SuccessResponse } from "@/lib/api-response";
+import { catchAsync } from "@/lib/catchAsync";
+import { eq } from "drizzle-orm";
 
-// GET recipe detail
-export async function GET(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const id = parseInt((await params).id);
-  if (isNaN(id)) {
-    return Response.json({ message: "Invalid recipe id" }, { status: 400 });
-  }
+export const GET = catchAsync(
+  async (req: Request, { params }: { params: Promise<{ id: string }> }) => {
+    const recipeId = parseInt((await params).id);
 
-  try {
-    const data = await db.select().from(recipes).where(eq(recipes.id, id));
-
-    if (data.length === 0) {
-      return Response.json({ message: "Recipe not found" }, { status: 404 });
-    } 
-
-    return Response.json({ message: "Recipe fetched successfully", data });
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error("Error fetching recipe details:", error.message);
-    }
-  }
-}
-
-// UPDATE recipe detail
-export async function PATCH(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const id = parseInt((await params).id);
-  const body = await request.json();
-  console.log("body", body)
-  if (isNaN(id)) {
-    return Response.json({ message: "Invalid recipe id" }, { status: 400 });
-  }
-
-  try {
-    const data = await db.update(recipes).set({...body, updatedAt: sql`NOW()`}).where(eq(recipes.id, id))
-
-    if (data.length === 0) {
-      return Response.json({ message: "Recipe not found" }, { status: 404 });
+    // Validate the recipe ID
+    if (isNaN(recipeId)) {
+      return Response.json(
+        ErrorResponse("Invalid recipe id", [
+          {
+            code: "INVALID_ID",
+            message: "The recipe ID provided is not a valid number.",
+          },
+        ]),
+        { status: 400 }
+      );
     }
 
-    return Response.json({ message: "Recipe updated successfully", data });
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error("Error updating recipe details:", error.message);
-    }
-  }
-}
+    // Check if recipe exists
+    const recipeExists = await db.query.recipeTable.findFirst({
+      where: eq(recipeTable.id, recipeId),
+    });
 
-// DELETE recipe detail
-export async function DELETE(
-  request: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const id = parseInt((await params).id);
-  if (isNaN(id)) {
-    return new Response("Invalid recipe ID", { status: 400 });
-  }
-  try {
-    const data = await db.delete(recipes).where(eq(recipes.id, id));
-
-    if (data.length === 0) {
-      return Response.json({ message: "Recipes not found" }, { status: 404 });
+    if (!recipeExists) {
+      return Response.json(
+        ErrorResponse("Recipe not found", [
+          {
+            code: "NOT_FOUND",
+            message: `Recipe with ID ${recipeId} cannot be found.`,
+          },
+        ]),
+        { status: 404 }
+      );
     }
+
+    const data = await db
+      .select()
+      .from(recipeTable)
+      .where(eq(recipeTable.id, recipeId));
+
+    return Response.json(
+      { data, message: "Recipe fetched successfully " },
+      { status: 200 }
+    );
+  }
+);
+
+export const PATCH = catchAsync(
+  async (req: Request, { params }: { params: Promise<{ id: string }> }) => {
+    const recipeId = parseInt((await params).id);
+    const body = await req.json();
+
+    // Validate the recipe ID
+    if (isNaN(recipeId)) {
+      return Response.json(
+        ErrorResponse("Invalid recipe id", [
+          {
+            code: "INVALID_ID",
+            message: "The recipe ID provided is not a valid number.",
+          },
+        ]),
+        { status: 400 }
+      );
+    }
+
+    const recipeExists = await db.query.recipeTable.findFirst({
+      where: eq(recipeTable.id, recipeId),
+    });
+
+    // Check if recipe exists
+    if (!recipeExists) {
+      return Response.json(
+        ErrorResponse("Recipe not found", [
+          {
+            code: "NOT_FOUND",
+            message: `Recipe with ID ${recipeId} cannot be found.`,
+          },
+        ]),
+        { status: 404 }
+      );
+    }
+
+    // Validate only fields being updated
+    const parsedBody = recipeSchema.partial().parse(body);
+
+    // Ensure at least one field to update
+    if (Object.keys(parsedBody).length === 0) {
+      return Response.json(
+        ErrorResponse("No fields to update", [
+          {
+            code: "NO_FIELDS",
+            message: "Please provide at least one field to update.",
+          },
+        ]),
+        { status: 400 }
+      );
+    }
+
+    await db
+      .update(recipeTable)
+      .set(parsedBody)
+      .where(eq(recipeTable.id, recipeId));
 
     return new Response(null, { status: 204 });
-  } catch (error) {
-    if (error instanceof Error) {
-      console.error("Error deleting recipe details:", error.message);
-    }
   }
-}
+);
+
+export const DELETE = catchAsync(
+  async (req: Request, { params }: { params: Promise<{ id: string }> }) => {
+    const recipeId = parseInt((await params).id);
+
+    // Validate the recipe ID
+    if (isNaN(recipeId)) {
+      return Response.json(
+        ErrorResponse("Invalid recipe id", [
+          {
+            code: "INVALID_ID",
+            message: "The recipe ID provided is not a valid number.",
+          },
+        ]),
+        { status: 400 }
+      );
+    }
+
+    const recipeExists = await db.query.recipeTable.findFirst({
+      where: eq(recipeTable.id, recipeId),
+    });
+
+    // Check if recipe exists
+    if (!recipeExists) {
+      return Response.json(
+        ErrorResponse("Recipe not found", [
+          {
+            code: "NOT_FOUND",
+            message: `Recipe with ID ${recipeId} cannot be found.`,
+          },
+        ]),
+        { status: 404 }
+      );
+    }
+
+    await db.delete(recipeTable).where(eq(recipeTable.id, recipeId));
+
+    return new Response(null, { status: 204 });
+  }
+);
