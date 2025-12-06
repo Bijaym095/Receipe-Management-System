@@ -44,10 +44,7 @@ export const GET = catchAsync(
       .from(recipeTable)
       .where(eq(recipeTable.id, recipeId));
 
-    return Response.json(
-      { data, message: "Recipe fetched successfully " },
-      { status: 200 }
-    );
+    return Response.json(SuccessResponse(data, "Recipe fetched successfully!"));
   }
 );
 
